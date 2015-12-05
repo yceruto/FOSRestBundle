@@ -11,8 +11,8 @@
 
 namespace FOS\RestBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Checks if a serializer is either set or can be auto-configured.
@@ -35,13 +35,26 @@ class SerializerConfigurationPass implements CompilerPassInterface
         }
 
         if ($container->has('jms_serializer.serializer')) {
-            $container->setAlias('fos_rest.serializer', 'jms_serializer.serializer');
+            $container->setAlias('fos_rest.serializer', 'fos_rest.serializer.jms');
         } else {
             $container->removeDefinition('fos_rest.serializer.exception_wrapper_serialize_handler');
         }
 
         if ($container->has('serializer')) {
-            $container->setAlias('fos_rest.serializer', 'serializer');
+            $serializer = $container->findDefinition('serializer');
+            $class = $serializer->getClass();
+
+            if ('%' === $class[0]) {
+                $class = $container->getParameter(substr($class, 1, -1));
+            }
+
+            if (is_subclass_of($class, 'Symfony\Component\Serializer\SerializerInterface')) {
+                $container->setAlias('fos_rest.serializer', 'fos_rest.serializer.symfony');
+            } elseif (is_subclass_of($class, 'JMS\Serializer\SerializerInterface')) {
+                $container->setAlias('fos_rest.serializer', 'fos_rest.serializer.jms');
+            } else {
+                throw new \LogicException(sprintf('Cannot handle serializer of type "%s"', $class));
+            }
         } else {
             $container->removeDefinition('fos_rest.serializer.exception_wrapper_normalizer');
         }

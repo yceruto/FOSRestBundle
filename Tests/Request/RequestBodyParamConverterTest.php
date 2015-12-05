@@ -40,10 +40,10 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             );
         }
 
-        $this->serializer = $this->getMock('JMS\Serializer\SerializerInterface');
+        $this->serializer = $this->getMock('FOS\RestBundle\Serializer\Serializer');
         $this->converter = $this->getMock(
             'FOS\RestBundle\Request\RequestBodyParamConverter',
-            array('getDeserializationContext'),
+            array('getContext'),
             array($this->serializer)
         );
     }
@@ -81,7 +81,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             ->will($this->returnValue($expectedPost));
 
         $this->converter->expects($this->once())
-            ->method('getDeserializationContext')
+            ->method('getContext')
             ->will($this->returnValue($this->createDeserializationContext()));
 
         $request = $this->createRequest('{"name": "Post 1", "body": "This is a blog post"}', 'application/json');
@@ -99,7 +99,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             ->will($this->throwException(new UnsupportedFormatException('unsupported format')));
 
         $this->converter->expects($this->once())
-            ->method('getDeserializationContext')
+            ->method('getContext')
             ->will($this->returnValue($this->createDeserializationContext()));
 
         $request = $this->createRequest('', 'text/html');
@@ -117,7 +117,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             ->will($this->throwException(new RuntimeException('serializer exception')));
 
         $this->converter->expects($this->once())
-            ->method('getDeserializationContext')
+            ->method('getContext')
             ->will($this->returnValue($this->createDeserializationContext()));
 
         $request = $this->createRequest();
@@ -147,7 +147,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
         );
 
         $this->converter->expects($this->once())
-            ->method('getDeserializationContext')
+            ->method('getContext')
             ->will($this->returnValue($context));
 
         $this->serializer->expects($this->once())
@@ -164,7 +164,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
     {
         $this->converter = $this->getMock(
             'FOS\RestBundle\Request\RequestBodyParamConverter',
-            array('getDeserializationContext'),
+            array('getContext'),
             array($this->serializer, array('group1'), '1.0')
         );
 
@@ -173,7 +173,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
         $config = $this->createConfiguration('FOS\RestBundle\Tests\Request\Post', 'post');
 
         $this->converter->expects($this->once())
-            ->method('getDeserializationContext')
+            ->method('getContext')
             ->will($this->returnValue($context));
 
         $this->serializer->expects($this->once())

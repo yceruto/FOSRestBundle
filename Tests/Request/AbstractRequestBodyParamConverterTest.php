@@ -64,10 +64,10 @@ abstract class AbstractRequestBodyParamConverterTest extends \PHPUnit_Framework_
 
     protected function createDeserializationContext($groups = null, $version = null)
     {
-        $context = $this->getMock('JMS\Serializer\DeserializationContext');
+        $context = $this->getMock('FOS\RestBundle\Context\Context', array());
         if (null !== $groups) {
             $context->expects($this->once())
-                ->method('setGroups')
+                ->method('addGroups')
                 ->with($groups);
         }
         if (null !== $version) {

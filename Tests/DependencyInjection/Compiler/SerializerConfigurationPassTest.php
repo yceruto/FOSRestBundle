@@ -12,28 +12,31 @@
 namespace FOS\RestBundle\Tests\DependencyInjection\Compiler;
 
 use FOS\RestBundle\DependencyInjection\Compiler\SerializerConfigurationPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * SerializerConfigurationPassTest test.
  */
 class SerializerConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ContainerBuilder
+     */
+    private $container;
+
+    protected function setUp()
+    {
+        $this->container = new ContainerBuilder();
+    }
+
     public function testShouldDoNothingIfSerializerIsFound()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('has'))
-            ->getMock();
-
-        $container->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('fos_rest.serializer'))
-            ->will($this->returnValue(true));
-
-        $container->expects($this->never())
-            ->method('setAlias');
+        $this->container->register('fos_rest.serializer', 'foo');
 
         $compiler = new SerializerConfigurationPass();
-        $compiler->process($container);
+        $compiler->process($this->container);
+
+        $this->assertSame('foo', $this->container->getDefinition('fos_rest.serializer')->getClass());
     }
 
     /**
@@ -41,65 +44,51 @@ class SerializerConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testShouldThrowInvalidArgumentExceptionWhenNoSerializerIsFound()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('has'))
-            ->getMock();
-
-        $container->method('has')
-            ->will($this->returnValueMap(array(
-                array('fos_rest.serializer', false),
-                array('jms_serializer.serializer', false),
-                array('serializer', false), )));
-
         $compiler = new SerializerConfigurationPass();
-        $compiler->process($container);
+        $compiler->process($this->container);
     }
 
     public function testShouldConfigureJMSSerializer()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('has', 'setAlias', 'removeDefinition'))
-            ->getMock();
-
-        $container->method('has')
-            ->will($this->returnValueMap(array(
-                array('fos_rest.serializer', false),
-                array('jms_serializer.serializer', true),
-                array('serializer', true),
-            )));
-
-        $container->expects($this->exactly(2))
-            ->method('setAlias')
-            ->withConsecutive(
-                array($this->equalTo('fos_rest.serializer'), $this->equalTo('jms_serializer.serializer')),
-                array($this->equalTo('fos_rest.serializer'), $this->equalTo('serializer'))
-            );
+        $this->container->register('jms_serializer.serializer', 'JMS\Serializer\Serializer');
 
         $compiler = new SerializerConfigurationPass();
-        $compiler->process($container);
+        $compiler->process($this->container);
+
+        $this->assertSame('fos_rest.serializer.jms', (string) $this->container->getAlias('fos_rest.serializer'));
     }
 
     public function testShouldConfigureCoreSerializer()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('has', 'setAlias', 'removeDefinition'))
-            ->getMock();
-
-        $container->method('has')
-            ->will($this->returnValueMap(array(
-                array('fos_rest.serializer', false),
-                array('jms_serializer.serializer', false),
-                array('serializer', true), )));
-
-        $container->expects($this->once())
-            ->method('setAlias')
-            ->with($this->equalTo('fos_rest.serializer'), $this->equalTo('serializer'));
-
-        $container->expects($this->once())
-            ->method('removeDefinition')
-            ->with('fos_rest.serializer.exception_wrapper_serialize_handler');
+        $this->container->register('serializer', 'Symfony\Component\Serializer\Serializer');
+        $this->container->register('fos_rest.serializer.exception_wrapper_serialize_handler');
 
         $compiler = new SerializerConfigurationPass();
-        $compiler->process($container);
+        $compiler->process($this->container);
+
+        $this->assertSame('fos_rest.serializer.symfony', (string) $this->container->getAlias('fos_rest.serializer'));
+        $this->assertTrue(!$this->container->has('fos_rest.serializer.exception_wrapper_serialize_handler'));
+    }
+
+    public function testSerializerServiceSupersedesJmsSerializerService()
+    {
+        $this->container->register('jms_serializer.serializer', 'JMS\Serializer\Serializer');
+        $this->container->register('serializer', 'Symfony\Component\Serializer\Serializer');
+
+        $compiler = new SerializerConfigurationPass();
+        $compiler->process($this->container);
+
+        $this->assertSame('fos_rest.serializer.symfony', (string) $this->container->getAlias('fos_rest.serializer'));
+    }
+
+    public function testSerializerServiceCanBeJmsSerializer()
+    {
+        $this->container->register('jms_serializer.serializer', 'JMS\Serializer\Serializer');
+        $this->container->register('serializer', 'JMS\Serializer\Serializer');
+
+        $compiler = new SerializerConfigurationPass();
+        $compiler->process($this->container);
+
+        $this->assertSame('fos_rest.serializer.jms', (string) $this->container->getAlias('fos_rest.serializer'));
     }
 }
