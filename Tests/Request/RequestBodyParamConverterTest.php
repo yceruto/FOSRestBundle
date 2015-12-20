@@ -11,6 +11,7 @@
 
 namespace FOS\RestBundle\Tests\Request;
 
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Request\RequestBodyParamConverter;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Exception\UnsupportedFormatException;
@@ -82,7 +83,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
 
         $this->converter->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createDeserializationContext()));
+            ->willReturn(new Context());
 
         $request = $this->createRequest('{"name": "Post 1", "body": "This is a blog post"}', 'application/json');
 
@@ -100,7 +101,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
 
         $this->converter->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createDeserializationContext()));
+            ->willReturn(new Context());
 
         $request = $this->createRequest('', 'text/html');
 
@@ -118,7 +119,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
 
         $this->converter->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createDeserializationContext()));
+            ->willReturn(new Context());
 
         $request = $this->createRequest();
 
@@ -141,10 +142,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             ),
         );
 
-        $context = $this->createDeserializationContext(
-            $options['deserializationContext']['groups'],
-            $options['deserializationContext']['version']
-        );
+        $context = new Context();
 
         $this->converter->expects($this->once())
             ->method('getContext')
@@ -158,6 +156,9 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
         $config = $this->createConfiguration('FOS\RestBundle\Tests\Request\Post', 'post', $options);
 
         $this->converter->apply($request, $config);
+
+        $this->assertEquals($options['deserializationContext']['groups'], $context->getGroups());
+        $this->assertEquals($options['deserializationContext']['version'], $context->getVersion());
     }
 
     public function testApplyWithDefaultSerializerContextExclusionPolicy()
@@ -168,7 +169,7 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             array($this->serializer, array('group1'), '1.0')
         );
 
-        $context = $this->createDeserializationContext(array('group1'), '1.0');
+        $context = new Context();
         $request = $this->createRequest('', 'application/json');
         $config = $this->createConfiguration('FOS\RestBundle\Tests\Request\Post', 'post');
 
@@ -181,6 +182,9 @@ class RequestBodyParamConverterTest extends AbstractRequestBodyParamConverterTes
             ->with('', 'FOS\RestBundle\Tests\Request\Post', 'json', $context);
 
         $this->converter->apply($request, $config);
+
+        $this->assertEquals(array('group1'), $context->getGroups());
+        $this->assertEquals('1.0', $context->getVersion());
     }
 
     public function testApplyWithSerializerContextOptionsForSymfonySerializer()

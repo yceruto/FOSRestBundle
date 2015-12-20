@@ -11,11 +11,7 @@
 
 namespace FOS\RestBundle\Serializer;
 
-use FOS\RestBundle\Context\ContextInterface;
-use FOS\RestBundle\Context\GroupableContextInterface;
-use FOS\RestBundle\Context\MaxDepthContextInterface;
-use FOS\RestBundle\Context\SerializeNullContextInterface;
-use FOS\RestBundle\Context\VersionableContextInterface;
+use FOS\RestBundle\Context\Context;
 use JMS\Serializer\Context as JMSContext;
 use JMS\Serializer\DeserializationContext as JMSDeserializationContext;
 use JMS\Serializer\SerializationContext as JMSSerializationContext;
@@ -72,14 +68,14 @@ final class JMSSerializerAdapter implements Serializer
     private function convertContext($context, $direction)
     {
         if ($context instanceof JMSContext) {
-            @trigger_error(sprintf('Support of %s is deprecated since version 1.8 and will be removed in 2.0. You should use FOS\RestBundle\Context\ContextInterface instead.', get_class($context)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Support of %s is deprecated since version 1.8 and will be removed in 2.0. You should use FOS\RestBundle\Context\Context instead.', get_class($context)), E_USER_DEPRECATED);
             $jmsContext = $context;
-        } elseif ($context instanceof ContextInterface) {
+        } elseif ($context instanceof Context) {
             if ($direction === self::SERIALIZATION) {
                 $jmsContext = JMSSerializationContext::create();
             } else {
                 $jmsContext = JMSDeserializationContext::create();
-                if ($context instanceof MaxDepthContextInterface && null !== $context->getMaxDepth()) {
+                if (null !== $context->getMaxDepth()) {
                     for ($i = 0; $i < $context->getMaxDepth(); ++$i) {
                         $jmsContext->increaseDepth();
                     }
@@ -90,19 +86,17 @@ final class JMSSerializerAdapter implements Serializer
                 $jmsContext->attributes->set($key, $value);
             }
 
-            if ($context instanceof VersionableContextInterface && null !== $context->getVersion()) {
+            if (null !== $context->getVersion()) {
                 $jmsContext->setVersion($context->getVersion());
             }
-            if ($context instanceof GroupableContextInterface) {
-                $groups = $context->getGroups();
-                if (!empty($groups)) {
-                    $jmsContext->setGroups($context->getGroups());
-                }
+            $groups = $context->getGroups();
+            if (!empty($groups)) {
+                $jmsContext->setGroups($context->getGroups());
             }
-            if ($context instanceof MaxDepthContextInterface && null !== $context->getMaxDepth()) {
+            if (null !== $context->getMaxDepth()) {
                 $jmsContext->enableMaxDepthChecks();
             }
-            if ($context instanceof SerializeNullContextInterface && null !== $context->getSerializeNull()) {
+            if (null !== $context->getSerializeNull()) {
                 $jmsContext->setSerializeNull($context->getSerializeNull());
             }
         } else {

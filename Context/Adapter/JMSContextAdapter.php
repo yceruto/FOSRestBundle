@@ -11,23 +11,23 @@
 
 namespace FOS\RestBundle\Context\Adapter;
 
-use FOS\RestBundle\Context\ContextInterface;
-use FOS\RestBundle\Context\GroupableContextInterface;
-use FOS\RestBundle\Context\MaxDepthContextInterface;
-use FOS\RestBundle\Context\SerializeNullContextInterface;
-use FOS\RestBundle\Context\VersionableContextInterface;
+use FOS\RestBundle\Context\Context;
 use JMS\Serializer\Context as JMSContext;
 use JMS\Serializer\DeserializationContext as JMSDeserializationContext;
 use JMS\Serializer\SerializationContext as JMSSerializationContext;
 
 /**
+ * BC FOSRestBundle < 2.0.
+ *
  * @author Ener-Getick <egetick@gmail.com>
  *
  * @internal
+ *
+ * @todo Remove this in 2.0
  */
 final class JMSContextAdapter
 {
-    public static function convertSerializationContext(ContextInterface $context)
+    public static function convertSerializationContext(Context $context)
     {
         $newContext = JMSSerializationContext::create();
         self::fillContext($context, $newContext);
@@ -35,10 +35,10 @@ final class JMSContextAdapter
         return $newContext;
     }
 
-    public static function convertDeserializationContext(ContextInterface $context)
+    public static function convertDeserializationContext(Context $context)
     {
         $newContext = JMSDeserializationContext::create();
-        if ($context instanceof MaxDepthContextInterface && null !== $context->getMaxDepth()) {
+        if (null !== $context->getMaxDepth()) {
             for ($i = 0; $i < $context->getMaxDepth(); ++$i) {
                 $newContext->increaseDepth();
             }
@@ -52,30 +52,28 @@ final class JMSContextAdapter
     /**
      * Fill a jms context.
      *
-     * @param ContextInterface $context
-     * @param JMSContext       $newContext
+     * @param Context    $context
+     * @param JMSContext $newContext
      *
      * @return JMSContext
      */
-    private static function fillContext(ContextInterface $context, JMSContext $newContext)
+    private static function fillContext(Context $context, JMSContext $newContext)
     {
         foreach ($context->getAttributes() as $key => $value) {
             $newContext->attributes->set($key, $value);
         }
 
-        if ($context instanceof VersionableContextInterface && null !== $context->getVersion()) {
+        if (null !== $context->getVersion()) {
             $newContext->setVersion($context->getVersion());
         }
-        if ($context instanceof GroupableContextInterface) {
-            $groups = $context->getGroups();
-            if (!empty($groups)) {
-                $newContext->setGroups($context->getGroups());
-            }
+        $groups = $context->getGroups();
+        if (!empty($groups)) {
+            $newContext->setGroups($context->getGroups());
         }
-        if ($context instanceof MaxDepthContextInterface && null !== $context->getMaxDepth()) {
+        if (null !== $context->getMaxDepth()) {
             $newContext->enableMaxDepthChecks();
         }
-        if ($context instanceof SerializeNullContextInterface && null !== $context->getSerializeNull()) {
+        if (null !== $context->getSerializeNull()) {
             $newContext->setSerializeNull($context->getSerializeNull());
         }
 

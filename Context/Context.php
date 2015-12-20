@@ -12,44 +12,40 @@
 namespace FOS\RestBundle\Context;
 
 /**
- * {@inheritdoc}
+ * Stores the serialization or deserialization context (groups, version, ...).
  *
  * @author Ener-Getick <egetick@gmail.com>
  */
-class Context implements ContextInterface, GroupableContextInterface, VersionableContextInterface, MaxDepthContextInterface, SerializeNullContextInterface
+final class Context
 {
     /**
      * @var array
      */
-    protected $attributes;
+    private $attributes = array();
     /**
      * @var int|null
      */
-    protected $version;
+    private $version;
     /**
      * @var array
      */
-    protected $groups;
+    private $groups = array();
     /**
      * @var int
      */
-    protected $maxDepth;
+    private $maxDepth;
     /**
      * @var bool
      */
-    protected $serializeNull;
+    private $serializeNull;
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->attributes = array();
-        $this->groups = array();
-    }
-
-    /**
-     * {@inheritdoc}
+     * Sets an attribute.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return self
      */
     public function setAttribute($key, $value)
     {
@@ -59,7 +55,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Checks if contains a normalization attribute.
+     *
+     * @param string $key
+     *
+     * @return bool
      */
     public function hasAttribute($key)
     {
@@ -67,7 +67,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets an attribute.
+     *
+     * @param string $key
+     *
+     * @return mixed
      */
     public function getAttribute($key)
     {
@@ -77,7 +81,9 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the attributes.
+     *
+     * @return array
      */
     public function getAttributes()
     {
@@ -85,7 +91,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the normalization version.
+     *
+     * @param int|null $version
+     *
+     * @return self
      */
     public function setVersion($version)
     {
@@ -95,7 +105,9 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the normalization version.
+     *
+     * @return int|null
      */
     public function getVersion()
     {
@@ -103,7 +115,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Adds a normalization group.
+     *
+     * @param string $group
+     *
+     * @return self
      */
     public function addGroup($group)
     {
@@ -115,7 +131,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Adds normalization groups.
+     *
+     * @param string[] $groups
+     *
+     * @return self
      */
     public function addGroups(array $groups)
     {
@@ -127,7 +147,9 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the normalization groups.
+     *
+     * @return array
      */
     public function getGroups()
     {
@@ -135,7 +157,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the normalization max depth.
+     *
+     * @param int|null $depth
+     *
+     * @return self
      */
     public function setMaxDepth($maxDepth)
     {
@@ -145,7 +171,9 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the normalization max depth.
+     *
+     * @return int|null
      */
     public function getMaxDepth()
     {
@@ -153,7 +181,11 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Sets serialize null.
+     *
+     * @param bool|null $serializeNull
+     *
+     * @return self
      */
     public function setSerializeNull($serializeNull)
     {
@@ -163,7 +195,9 @@ class Context implements ContextInterface, GroupableContextInterface, Versionabl
     }
 
     /**
-     * {@inheritdoc}
+     * Gets serialize null.
+     *
+     * @return bool|null
      */
     public function getSerializeNull()
     {

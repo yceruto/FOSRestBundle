@@ -13,7 +13,6 @@ namespace FOS\RestBundle\View;
 
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Context\Context;
-use FOS\RestBundle\Context\ContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
@@ -37,7 +36,7 @@ class View
     private $routeParameters;
 
     /**
-     * @var SerializationContext|ContextInterface
+     * @var SerializationContext|Context
      */
     private $context;
 
@@ -194,11 +193,11 @@ class View
     /**
      * Sets the serialization context.
      *
-     * @param ContextInterface $context
+     * @param Context $context
      *
      * @return View
      */
-    public function setContext(ContextInterface $context)
+    public function setContext(Context $context)
     {
         $this->context = $context;
 
@@ -468,7 +467,7 @@ class View
     /**
      * Gets the serialization context.
      *
-     * @return SerializationContext|ContextInterface
+     * @return SerializationContext|Context
      */
     public function getContext()
     {
@@ -482,7 +481,7 @@ class View
     /**
      * Gets the serialization context.
      *
-     * @return SerializationContext|ContextInterface
+     * @return SerializationContext|Context
      *
      * @deprecated since 1.8, to be removed in 2.0. Use {@link View::getContext()} instead.
      */

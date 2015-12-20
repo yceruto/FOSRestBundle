@@ -53,7 +53,8 @@ class SerializerConfigurationPass implements CompilerPassInterface
             } elseif (is_subclass_of($class, 'JMS\Serializer\SerializerInterface')) {
                 $container->setAlias('fos_rest.serializer', 'fos_rest.serializer.jms');
             } else {
-                throw new \LogicException(sprintf('Cannot handle serializer of type "%s"', $class));
+                @trigger_error('Support of custom serializers is deprecated since 1.8 and will be dropped in 2.0. You should create a new class implementing FOS\RestBundle\Serializer\Serializer and define it as fos_rest.serializer', E_USER_DEPRECATED);
+                $container->setAlias('fos_rest.serializer', 'serializer');
             }
         } else {
             $container->removeDefinition('fos_rest.serializer.exception_wrapper_normalizer');

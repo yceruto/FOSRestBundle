@@ -12,7 +12,6 @@
 namespace FOS\RestBundle\Request;
 
 use FOS\RestBundle\Context\Context;
-use FOS\RestBundle\Context\ContextInterface;
 use FOS\RestBundle\Serializer\Serializer;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\Exception\Exception as JMSSerializerException;
@@ -164,7 +163,7 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
     }
 
     /**
-     * @return ContextInterface
+     * @return Context
      */
     protected function getContext()
     {
@@ -184,12 +183,12 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
     }
 
     /**
-     * @param ContextInterface $context
-     * @param array            $options
+     * @param Context $context
+     * @param array   $options
      *
-     * @return ContextInterface
+     * @return Context
      */
-    protected function configureContext(ContextInterface $context, array $options)
+    protected function configureContext(Context $context, array $options)
     {
         if (isset($options['groups'])) {
             $context->addGroups($options['groups']);

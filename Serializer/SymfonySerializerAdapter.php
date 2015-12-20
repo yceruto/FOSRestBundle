@@ -11,11 +11,7 @@
 
 namespace FOS\RestBundle\Serializer;
 
-use FOS\RestBundle\Context\ContextInterface;
-use FOS\RestBundle\Context\GroupableContextInterface;
-use FOS\RestBundle\Context\MaxDepthContextInterface;
-use FOS\RestBundle\Context\SerializeNullContextInterface;
-use FOS\RestBundle\Context\VersionableContextInterface;
+use FOS\RestBundle\Context\Context;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -37,14 +33,12 @@ final class SymfonySerializerAdapter implements Serializer
      */
     public function serialize($data, $format, $context = null)
     {
-        if (!($context instanceof ContextInterface)) {
-            @trigger_error(sprintf('You must pass a FOS\RestBundle\Context\ContextInterface instance to %s since version 1.8.', __METHOD__), E_USER_DEPRECATED);
+        if (!($context instanceof Context)) {
+            @trigger_error(sprintf('You must pass a FOS\RestBundle\Context\Context instance to %s since version 1.8.', __METHOD__), E_USER_DEPRECATED);
             $newContext = array();
         } else {
             $newContext = $this->convertContext($context);
-            if ($context instanceof SerializeNullContextInterface) {
-                $newContext['serializeNull'] = $context->getSerializeNull();
-            }
+            $newContext['serializeNull'] = $context->getSerializeNull();
         }
 
         return $this->serializer->serialize($data, $format, $newContext);
@@ -55,8 +49,8 @@ final class SymfonySerializerAdapter implements Serializer
      */
     public function deserialize($data, $type, $format, $context = null)
     {
-        if (!($context instanceof ContextInterface)) {
-            @trigger_error(sprintf('You must pass a FOS\RestBundle\Context\ContextInterface instance to %s since version 1.8.', __METHOD__), E_USER_DEPRECATED);
+        if (!($context instanceof Context)) {
+            @trigger_error(sprintf('You must pass a FOS\RestBundle\Context\Context instance to %s since version 1.8.', __METHOD__), E_USER_DEPRECATED);
             $newContext = array();
         } else {
             $newContext = $this->convertContext($context);
@@ -66,24 +60,18 @@ final class SymfonySerializerAdapter implements Serializer
     }
 
     /**
-     * @param ContextInterface $context
+     * @param Context $context
      */
-    private function convertContext(ContextInterface $context)
+    private function convertContext(Context $context)
     {
         $newContext = array();
         foreach ($context->getAttributes() as $key => $value) {
             $newContext[$key] = $value;
         }
 
-        if ($context instanceof GroupableContextInterface) {
-            $newContext['groups'] = $context->getGroups();
-        }
-        if ($context instanceof VersionableContextInterface) {
-            $newContext['version'] = $context->getVersion();
-        }
-        if ($context instanceof MaxDepthContextInterface) {
-            $newContext['maxDepth'] = $context->getMaxDepth();
-        }
+        $newContext['groups'] = $context->getGroups();
+        $newContext['version'] = $context->getVersion();
+        $newContext['maxDepth'] = $context->getMaxDepth();
 
         return $newContext;
     }

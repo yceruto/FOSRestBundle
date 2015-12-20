@@ -11,7 +11,7 @@
 
 namespace FOS\RestBundle\View;
 
-use FOS\RestBundle\Context\ContextInterface;
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Context\Adapter\JMSContextAdapter;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Util\ContextHelper;
@@ -486,7 +486,7 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
             $serializer = $this->getSerializer($view);
             if ($serializer instanceof JMSSerializerInterface || $serializer instanceof Serializer) {
                 $context = $this->getSerializationContext($view);
-                if ($serializer instanceof JMSSerializerInterface && $context instanceof ContextInterface) {
+                if ($serializer instanceof JMSSerializerInterface && $context instanceof Context) {
                     $context = JMSContextAdapter::convertSerializationContext($context);
                 }
                 $content = $serializer->serialize($data, $format, $context);

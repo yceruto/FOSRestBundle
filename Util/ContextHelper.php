@@ -11,10 +11,7 @@
 
 namespace FOS\RestBundle\Util;
 
-use FOS\RestBundle\Context\GroupableContextInterface;
-use FOS\RestBundle\Context\SerializeNullContextInterface;
-use FOS\RestBundle\Context\VersionableContextInterface;
-use FOS\RestBundle\Context\MaxDepthContextInterface;
+use FOS\RestBundle\Context\Context;
 use JMS\Serializer\Context as JMSContext;
 
 /**
@@ -26,7 +23,7 @@ final class ContextHelper
 {
     public static function getGroups($context)
     {
-        if ($context instanceof GroupableContextInterface) {
+        if ($context instanceof Context) {
             return $context->getGroups();
         } elseif ($context instanceof JMSContext) {
             try {
@@ -38,7 +35,7 @@ final class ContextHelper
 
     public static function addGroups($context, array $groups)
     {
-        if ($context instanceof GroupableContextInterface) {
+        if ($context instanceof Context) {
             return $context->addGroups($groups);
         } elseif ($context instanceof JMSContext) {
             return $context->setGroups($groups);
@@ -47,7 +44,7 @@ final class ContextHelper
 
     public static function getVersion($context)
     {
-        if ($context instanceof VersionableContextInterface) {
+        if ($context instanceof Context) {
             return $context->getVersion();
         } elseif ($context instanceof JMSContext) {
             try {
@@ -59,14 +56,12 @@ final class ContextHelper
 
     public static function setVersion($context, $version)
     {
-        if ($context instanceof GroupableContextInterface || $context instanceof JMSContext) {
-            return $context->setVersion($version);
-        }
+        return $context->setVersion($version);
     }
 
     public static function getSerializeNull($context)
     {
-        if ($context instanceof SerializeNullContextInterface) {
+        if ($context instanceof Context) {
             return $context->getSerializeNull();
         } elseif ($context instanceof JMSContext) {
             return $context->shouldSerializeNull();
@@ -75,14 +70,12 @@ final class ContextHelper
 
     public static function setSerializeNull($context, $serializeNull)
     {
-        if ($context instanceof SerializeNullContextInterface || $context instanceof JMSContext) {
-            return $context->setSerializeNull($serializeNull);
-        }
+        return $context->setSerializeNull($serializeNull);
     }
 
     public static function setMaxDepth($context, $maxDepth)
     {
-        if ($context instanceof MaxDepthContextInterface) {
+        if ($context instanceof Context) {
             $context->setMaxDepth($maxDepth);
         } elseif ($context instanceof JMSContext) {
             $context->enableMaxDepthChecks();

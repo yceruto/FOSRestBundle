@@ -11,7 +11,7 @@
 
 namespace FOS\RestBundle\Serializer;
 
-use FOS\RestBundle\Context\ContextInterface;
+use FOS\RestBundle\Context\Context;
 
 /**
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
@@ -21,7 +21,7 @@ interface Serializer
     /**
      * @param mixed  $data
      * @param string $format
-     * @param mixed  $context will only support {@link ContextInterface} in 2.0
+     * @param mixed  $context will only support {@link Context} in 2.0
      *
      * @return string
      */
@@ -31,7 +31,7 @@ interface Serializer
      * @param string $data
      * @param string $type
      * @param string $format
-     * @param mixed  $context will only support {@link ContextInterface} in 2.0
+     * @param mixed  $context will only support {@link Context} in 2.0
      *
      * @return mixed
      */
