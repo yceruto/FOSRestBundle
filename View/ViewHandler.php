@@ -392,6 +392,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
             }
         }
 
+        $this->deprecateGetter('getTemplating');
+
         return $this->getTemplating()->render($template, $data);
     }
 
@@ -436,6 +438,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
     public function createResponse(View $view, Request $request, $format)
     {
         $route = $view->getRoute();
+
+        $this->deprecateGetter('getRouter');
         $location = $route
             ? $this->getRouter()->generate($route, (array) $view->getRouteParameters(), UrlGeneratorInterface::ABSOLUTE_URL)
             : $view->getLocation();
@@ -468,7 +472,10 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
             $content = $this->renderTemplate($view, $format);
         } elseif ($this->serializeNull || null !== $view->getData()) {
             $data = $this->getDataFromView($view);
+
+            $this->deprecateGetter('getSerializer');
             $serializer = $this->getSerializer($view);
+
             if ($serializer instanceof SerializerInterface) {
                 $context = $this->getSerializationContext($view);
                 $content = $serializer->serialize($data, $format, $context);
@@ -538,5 +545,20 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
                  'errors' => $form,
             )
         );
+    }
+
+    /**
+     * Triggers a deprecation if a getter is extended.
+     *
+     * @todo remove this in 2.0.
+     */
+    private function deprecateGetter($name)
+    {
+        if (is_subclass_of($this, __CLASS__)) {
+            $method = new \ReflectionMethod($this, $name);
+            if ($method->getDeclaringClass()->getName() != __CLASS__) {
+                @trigger_error(sprintf('%s::%s() is deprecated since version 1.8 and will be removed in 2.0.', __CLASS__, $name), E_USER_DEPRECATED);
+            }
+        }
     }
 }
