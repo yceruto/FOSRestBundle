@@ -241,6 +241,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
      * Gets the router service.
      *
      * @return \Symfony\Component\Routing\RouterInterface
+     *
+     * @deprecated since 1.8, to be removed in 2.0.
      */
     protected function getRouter()
     {
@@ -253,6 +255,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
      * @param View $view view instance from which the serializer should be configured
      *
      * @return object that must provide a "serialize()" method
+     *
+     * @deprecated since 1.8, to be removed in 2.0.
      */
     protected function getSerializer(View $view = null)
     {
@@ -290,6 +294,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
      * Gets the templating service.
      *
      * @return \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface
+     *
+     * @deprecated since 1.8, to be removed in 2.0.
      */
     protected function getTemplating()
     {
