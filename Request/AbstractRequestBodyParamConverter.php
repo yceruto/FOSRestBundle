@@ -103,23 +103,27 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
         $options = (array) $configuration->getOptions();
 
         if (isset($options['deserializationContext']) && is_array($options['deserializationContext'])) {
-            $context = array_merge($this->context, $options['deserializationContext']);
+            $arrayContext = array_merge($this->context, $options['deserializationContext']);
         } else {
-            $context = $this->context;
+            $arrayContext = $this->context;
         }
 
         if ($this->serializer instanceof JMSSerializerInterface || $this->serializer instanceof Serializer) {
             // BC < 1.8
             if (get_class($this) == 'FOS\RestBundle\Request\RequestBodyParamConverter' || get_class($this) == 'FOS\RestBundle\Request\RequestBodyParamConverter20') {
-                $context = $this->configureContext($this->getContext(), $context);
+                $context = new Context();
+                $this->configureContext($context, $arrayContext);
             } else {
                 $method = new \ReflectionMethod($this, 'getDeserializationContext');
                 if ($method->getDeclaringClass()->getName() != __CLASS__) {
-                    $context = $this->configureDeserializationContext($this->getDeserializationContext(), $context);
+                    $context = $this->configureDeserializationContext($this->getDeserializationContext(), $arrayContext);
                 } else {
-                    $context = $this->configureContext($this->getContext(), $context);
+                    $context = new Context();
+                    $this->configureContext($context, $arrayContext);
                 }
             }
+        } else {
+            $context = $arrayContext;
         }
 
         try {
@@ -163,21 +167,13 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
     }
 
     /**
-     * @return Context
-     */
-    protected function getContext()
-    {
-        return new Context();
-    }
-
-    /**
      * @return DeserializationContext
      *
-     * @deprecated since 1.8, to be removed in 2.0. Use {@link AbstractRequestBodyParamConverter::getContext()} instead.
+     * @deprecated since 1.8, to be removed in 2.0. Use {@link AbstractRequestBodyParamConverter::configureContext()} instead.
      */
     protected function getDeserializationContext()
     {
-        @trigger_error(sprintf('%s is deprecated since version 1.8 and will be removed in 2.0. Use %s::getContext() instead.', __METHOD__, get_class($this)), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated since version 1.8 and will be removed in 2.0. Use %s::configureContext() instead.', __METHOD__, get_class($this)), E_USER_DEPRECATED);
 
         return DeserializationContext::create();
     }
@@ -185,8 +181,6 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
     /**
      * @param Context $context
      * @param array   $options
-     *
-     * @return Context
      */
     protected function configureContext(Context $context, array $options)
     {
@@ -196,8 +190,6 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
         if (isset($options['version'])) {
             $context->setVersion($options['version']);
         }
-
-        return $context;
     }
 
     /**
