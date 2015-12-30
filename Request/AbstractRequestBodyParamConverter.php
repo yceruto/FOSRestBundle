@@ -110,12 +110,12 @@ abstract class AbstractRequestBodyParamConverter implements ParamConverterInterf
 
         if ($this->serializer instanceof JMSSerializerInterface || $this->serializer instanceof Serializer) {
             // BC < 1.8
-            if (get_class($this) == 'FOS\RestBundle\Request\RequestBodyParamConverter' || get_class($this) == 'FOS\RestBundle\Request\RequestBodyParamConverter20') {
+            if (get_class($this) === 'FOS\RestBundle\Request\RequestBodyParamConverter' || get_class($this) === 'FOS\RestBundle\Request\RequestBodyParamConverter20') {
                 $context = new Context();
                 $this->configureContext($context, $arrayContext);
             } else {
                 $method = new \ReflectionMethod($this, 'getDeserializationContext');
-                if ($method->getDeclaringClass()->getName() != __CLASS__) {
+                if ($method->getDeclaringClass()->getName() !== __CLASS__) {
                     $context = $this->configureDeserializationContext($this->getDeserializationContext(), $arrayContext);
                 } else {
                     $context = new Context();

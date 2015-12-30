@@ -80,7 +80,7 @@ class ViewResponseListener extends TemplateListener
 
             // BC < 1.8
             $viewClass = 'FOS\RestBundle\View\View';
-            if (get_class($view) == $viewClass) {
+            if (get_class($view) === $viewClass) {
                 $context = $view->getContext();
             } else {
                 $method = new \ReflectionMethod($view, 'getSerializationContext');
