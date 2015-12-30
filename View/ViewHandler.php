@@ -556,8 +556,8 @@ class ViewHandler implements ConfigurableViewHandlerInterface, ContainerAwareInt
     {
         if (is_subclass_of($this, __CLASS__)) {
             $method = new \ReflectionMethod($this, $name);
-            if ($method->getDeclaringClass()->getName() != __CLASS__) {
-                @trigger_error(sprintf('%s::%s() is deprecated since version 1.8 and will be removed in 2.0.', __CLASS__, $name), E_USER_DEPRECATED);
+            if ($method->getDeclaringClass()->getName() !== __CLASS__) {
+                @trigger_error(sprintf('Overwriting %s::%s() is deprecated since version 1.8 and will be removed in 2.0. You should update your class %s.', __CLASS__, $name, get_class($this)), E_USER_DEPRECATED);
             }
         }
     }
