@@ -42,11 +42,9 @@ class SerializerConfigurationPass implements CompilerPassInterface
 
         if ($container->has('serializer')) {
             $serializer = $container->findDefinition('serializer');
-            $class = $serializer->getClass();
-
-            if ('%' === $class[0]) {
-                $class = $container->getParameter(substr($class, 1, -1));
-            }
+            $class = $container->getParameterBag()->resolveValue(
+                $serializer->getClass()
+            );
 
             if (is_subclass_of($class, 'Symfony\Component\Serializer\SerializerInterface')) {
                 $container->setAlias('fos_rest.serializer', 'fos_rest.serializer.symfony');
