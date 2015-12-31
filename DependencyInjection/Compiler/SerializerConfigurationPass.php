@@ -34,7 +34,7 @@ class SerializerConfigurationPass implements CompilerPassInterface
                 @trigger_error('Support of custom serializers is deprecated since 1.8 and will be dropped in 2.0. You should create a new class implementing FOS\RestBundle\Serializer\Serializer and define it as fos_rest.serializer', E_USER_DEPRECATED);
 
                 // @todo: Uncomment in 2.0
-                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implements FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
+                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implement FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
             }
 
             return;
@@ -64,7 +64,7 @@ class SerializerConfigurationPass implements CompilerPassInterface
                 $container->setAlias('fos_rest.serializer', 'serializer');
 
                 // @todo: Uncomment in 2.0
-                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implements FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
+                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implement FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
             }
         } else {
             $container->removeDefinition('fos_rest.serializer.exception_wrapper_normalizer');
