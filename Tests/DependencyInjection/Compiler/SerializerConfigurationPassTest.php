@@ -29,7 +29,7 @@ class SerializerConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
     }
 
-    public function testShouldDoNothingIfSerializerIsFound()
+    public function testLegacyShouldDoNothingIfSerializerIsFound()
     {
         $this->container->register('fos_rest.serializer', 'foo');
 
@@ -37,6 +37,17 @@ class SerializerConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $compiler->process($this->container);
 
         $this->assertSame('foo', $this->container->getDefinition('fos_rest.serializer')->getClass());
+    }
+
+    public function testShouldDoNothingIfSerializerIsFound()
+    {
+        $serializer = $this->getMock('FOS\RestBundle\Serializer\Serializer');
+        $this->container->register('fos_rest.serializer', get_class($serializer));
+
+        $compiler = new SerializerConfigurationPass();
+        $compiler->process($this->container);
+
+        $this->assertSame(get_class($serializer), $this->container->getDefinition('fos_rest.serializer')->getClass());
     }
 
     /**

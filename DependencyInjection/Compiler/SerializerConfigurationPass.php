@@ -27,6 +27,16 @@ class SerializerConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if ($container->has('fos_rest.serializer')) {
+            $class = $container->getParameterBag()->resolveValue(
+                $container->findDefinition('fos_rest.serializer')->getClass()
+            );
+            if (!is_subclass_of($class, 'FOS\RestBundle\Serializer\Serializer')) {
+                @trigger_error('Support of custom serializers is deprecated since 1.8 and will be dropped in 2.0. You should create a new class implementing FOS\RestBundle\Serializer\Serializer and define it as fos_rest.serializer', E_USER_DEPRECATED);
+
+                // @todo: Uncomment in 2.0
+                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implements FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
+            }
+
             return;
         }
 
@@ -41,9 +51,8 @@ class SerializerConfigurationPass implements CompilerPassInterface
         }
 
         if ($container->has('serializer')) {
-            $serializer = $container->findDefinition('serializer');
             $class = $container->getParameterBag()->resolveValue(
-                $serializer->getClass()
+                $container->findDefinition('serializer')->getClass()
             );
 
             if (is_subclass_of($class, 'Symfony\Component\Serializer\SerializerInterface')) {
@@ -53,6 +62,9 @@ class SerializerConfigurationPass implements CompilerPassInterface
             } else {
                 @trigger_error('Support of custom serializers is deprecated since 1.8 and will be dropped in 2.0. You should create a new class implementing FOS\RestBundle\Serializer\Serializer and define it as fos_rest.serializer', E_USER_DEPRECATED);
                 $container->setAlias('fos_rest.serializer', 'serializer');
+
+                // @todo: Uncomment in 2.0
+                // throw new \InvalidArgumentException(sprintf('"fos_rest.serializer" must implements FOS\RestBundle\Serializer\Serializer (instance of "%s" given).', $class));
             }
         } else {
             $container->removeDefinition('fos_rest.serializer.exception_wrapper_normalizer');
